@@ -49,6 +49,10 @@ On the customer and product pages:
   recommend next. Ticked, the customer's own products are marked "reviewed": a model that knows the
   customer ranks several of them near the top.
 - **"in N lists"** marks a product that N of the lists on the page contain.
+- **Each product** shows its group, ASIN, Amazon's average rating and how many customers in the
+  data reviewed it; the product page adds its Amazon sales rank (lower sells better). Rating and
+  sales rank come from the 2006 data. They need the API of HAN-improve commit `49d41e7` or later;
+  with an older API they are left out.
 
 The settings are part of the address, so a view can be bookmarked or shared, e.g.
 `/users/A3FF936V6MPPDI?size=4&k=20`.

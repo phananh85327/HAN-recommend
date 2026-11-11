@@ -4,6 +4,7 @@ import GroupBadge from '../components/GroupBadge.jsx'
 import ModelControls from '../components/ModelControls.jsx'
 import RecommendationGrid from '../components/RecommendationGrid.jsx'
 import { ErrorBox, Loading } from '../components/Status.jsx'
+import { count } from '../format.js'
 import { useAsync } from '../hooks.js'
 import { canFindSimilar } from '../models.js'
 import { useSelection } from '../selection.js'
@@ -38,12 +39,21 @@ export default function ProductPage() {
             <p className="meta">
               <GroupBadge group={info.data.product.group} />
               <span className="asin">ASIN {info.data.product.asin}</span>
-              <span>{info.data.reviewers.toLocaleString('en-US')} reviewers in the data</span>
+              <span>{count(info.data.product.reviewers ?? info.data.reviewers)} reviewers in the data</span>
+              {typeof info.data.product.avg_rating === 'number' && (
+                <span>★ {info.data.product.avg_rating.toFixed(1)} average rating</span>
+              )}
+              {typeof info.data.product.sales_rank === 'number' && (
+                <span>Sales rank {count(info.data.product.sales_rank)}</span>
+              )}
               <a href={`https://www.amazon.com/dp/${encodeURIComponent(asin)}`} target="_blank" rel="noreferrer">
                 Amazon page
               </a>
             </p>
-            <p className="hint">The data is from 2006, so the Amazon page may no longer exist.</p>
+            <p className="hint">
+              Rating and sales rank (lower sells better) are Amazon's, from the 2006 data, so the Amazon
+              page may no longer exist.
+            </p>
           </section>
           <h2>Similar products</h2>
           <ModelControls selection={selection} models={usable} />

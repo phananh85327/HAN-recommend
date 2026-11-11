@@ -33,6 +33,16 @@ describe('RecommendationGrid', () => {
     expect(screen.queryByText('Design Patterns').closest('li')).not.toHaveTextContent('in 2 lists')
   })
 
+  it('shows the rating and reviewers the API sends, and nothing for products without them', () => {
+    const withDetails = [{
+      ...MODELS[3],
+      items: items({ ...book, avg_rating: 4.5, reviewers: 30 }, product('0201633612', 'Design Patterns')),
+    }]
+    render(<MemoryRouter><RecommendationGrid results={withDetails} /></MemoryRouter>)
+    expect(screen.getByText('Effective C++').closest('li')).toHaveTextContent('★ 4.5 · 30 reviewers')
+    expect(screen.getByText('Design Patterns').closest('li')).not.toHaveTextContent('reviewers')
+  })
+
   it('marks products the customer reviewed', () => {
     show({ reviewed: new Set(['B000002UB2']) })
     expect(screen.getByText('Abbey Road').closest('li')).toHaveTextContent('reviewed')

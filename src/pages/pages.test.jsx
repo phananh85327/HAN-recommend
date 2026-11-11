@@ -84,13 +84,16 @@ describe('customer page', () => {
 
 describe('product pages', () => {
   it('asks for similar products without popularity, which has none', async () => {
+    const effective = { ...product('0201924889', 'Effective C++'), sales_rank: 1309, avg_rating: 4.5, reviewers: 30 }
     const calls = mockApi([
-      [/^\/api\/products\/0201924889$/, () => [200, { product: product('0201924889', 'Effective C++'), reviewers: 30 }]],
+      [/^\/api\/products\/0201924889$/, () => [200, { product: effective, reviewers: 30 }]],
       [/similar$/, perModel],
     ])
     visit('/products/0201924889')
     expect(await screen.findByRole('heading', { level: 1 })).toHaveTextContent('Effective C++')
     expect(screen.getByText('30 reviewers in the data')).toBeInTheDocument()
+    expect(screen.getByText('★ 4.5 average rating')).toBeInTheDocument()
+    expect(screen.getByText('Sales rank 1,309')).toBeInTheDocument()
     await screen.findAllByRole('region')
     const request = calls.find(u => u.pathname.endsWith('/similar'))
     expect(request.searchParams.get('models').split(',')).not.toContain('popularity_s1')

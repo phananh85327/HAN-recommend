@@ -45,6 +45,9 @@ async function get(path, params) {
 
 const id = value => encodeURIComponent(String(value).trim())
 
+// In the answers below, a product is {asin, title, group, sales_rank, avg_rating, reviewers}. An API
+// older than HAN-improve commit 49d41e7 sends only {asin, title, group}; the pages then leave the
+// rest out. A recommendation item is a product plus {rank, score}.
 export const api = {
   /** {status, models, products, users} */
   health: () => get('health'),
@@ -53,15 +56,15 @@ export const api = {
   /** {matching, users: [{id, index, reviewed}]} */
   sampleUsers: ({ min, max, limit, seed }) =>
     get('users', { min_reviewed: min, max_reviewed: max, limit, seed }),
-  /** {user: {id, index, reviewed}, products: [{asin, title, group}]} */
+  /** {user: {id, index, reviewed}, products: [product]} */
   user: userId => get(`users/${id(userId)}`),
-  /** {user, k, exclude_seen, results: [{...model info, items: [{rank, asin, title, group, score}]}]} */
+  /** {user, k, exclude_seen, results: [{...model info, items: [item]}]} */
   recommendations: (userId, { models, k, excludeSeen }) =>
     get(`users/${id(userId)}/recommendations`, { models: models.join(','), k, exclude_seen: excludeSeen }),
-  /** {products: [{asin, title, group}]} */
+  /** {products: [product]} */
   searchProducts: (q, limit = 50) => get('products', { q, limit }),
-  /** {product: {asin, title, group}, reviewers} */
+  /** {product, reviewers} */
   product: asin => get(`products/${id(asin)}`),
-  /** {product, k, results: [{...model info, items}]} */
+  /** {product, k, results: [{...model info, items: [item]}]} */
   similar: (asin, { models, k }) => get(`products/${id(asin)}/similar`, { models: models.join(','), k }),
 }

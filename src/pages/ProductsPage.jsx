@@ -5,6 +5,7 @@ import DemoList from '../components/DemoList.jsx'
 import GroupBadge from '../components/GroupBadge.jsx'
 import { ErrorBox, Loading } from '../components/Status.jsx'
 import { DEMO_PRODUCTS } from '../config.js'
+import { DETAILS_TITLE, productDetails } from '../format.js'
 import { useAsync } from '../hooks.js'
 
 export default function ProductsPage() {
@@ -42,6 +43,7 @@ export default function ProductsPage() {
                 <GroupBadge group={p.group} />{' '}
                 <Link to={`/products/${encodeURIComponent(p.asin)}`}>{p.title || p.asin}</Link>{' '}
                 <span className="asin">{p.asin}</span>
+                {productDetails(p) && <span className="details" title={DETAILS_TITLE}> · {productDetails(p)}</span>}
               </li>
             ))}
           </ul>
