@@ -4,7 +4,7 @@ import { MemoryRouter, Route, Routes } from 'react-router'
 import { describe, expect, it } from 'vitest'
 import Layout from '../components/Layout.jsx'
 import { ServedProvider } from '../served.jsx'
-import { MODELS, items, mockApi, product } from '../test/mockApi.js'
+import { MODELS, items, mockApi, product, productWithCategory } from '../test/mockApi.js'
 import ProductPage from './ProductPage.jsx'
 import ProductsPage from './ProductsPage.jsx'
 import UserPage from './UserPage.jsx'
@@ -97,6 +97,33 @@ describe('product pages', () => {
     await screen.findAllByRole('region')
     const request = calls.find(u => u.pathname.endsWith('/similar'))
     expect(request.searchParams.get('models').split(',')).not.toContain('popularity_s1')
+  })
+
+  it('lists every category path in full: 10, then all of them on request', async () => {
+    const paths = Array.from({ length: 12 }, (_, i) => ['Books', 'Subjects', `Shelf ${i + 1}`])
+    const many = { ...productWithCategory('0590353403', 'Harry Potter', 'Book', paths[0]), categories: paths }
+    mockApi([
+      [/^\/api\/products\/0590353403$/, () => [200, { product: many, reviewers: 921 }]],
+      [/similar$/, perModel],
+    ])
+    visit('/products/0590353403')
+    expect(await screen.findByRole('heading', { name: 'Categories' })).toBeInTheDocument()
+    expect(screen.getByText('Books › Subjects › Shelf 1')).toBeInTheDocument()
+    expect(screen.getByText('Books › Subjects › Shelf 10')).toBeInTheDocument()
+    expect(screen.queryByText('Books › Subjects › Shelf 11')).not.toBeInTheDocument()
+    await userEvent.setup().click(screen.getByRole('button', { name: 'Show all 12' }))
+    expect(screen.getByText('Books › Subjects › Shelf 12')).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /Show all/ })).not.toBeInTheDocument()
+  })
+
+  it('shows no category list for an API without categories', async () => {
+    mockApi([
+      [/^\/api\/products\/0201924889$/, () => [200, { product: product('0201924889', 'Effective C++'), reviewers: 30 }]],
+      [/similar$/, perModel],
+    ])
+    visit('/products/0201924889')
+    expect(await screen.findByRole('heading', { level: 1 })).toHaveTextContent('Effective C++')
+    expect(screen.queryByRole('heading', { name: 'Categories' })).not.toBeInTheDocument()
   })
 
   it('searches by title and lists the matches', async () => {

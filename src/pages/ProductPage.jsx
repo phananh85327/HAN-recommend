@@ -1,10 +1,32 @@
+import { useState } from 'react'
 import { useParams } from 'react-router'
 import { api } from '../api.js'
 import GroupBadge from '../components/GroupBadge.jsx'
 import ModelControls from '../components/ModelControls.jsx'
 import RecommendationGrid from '../components/RecommendationGrid.jsx'
 import { ErrorBox, Loading } from '../components/Status.jsx'
-import { count } from '../format.js'
+import { categoryPath, count } from '../format.js'
+
+const FIRST_PATHS = 10
+
+/** Every category path of the product, in full; the first 10, then a button for the rest.
+ *  Nothing when the API sends none (no paths, or an API older than the categories). */
+function Categories({ paths }) {
+  const [all, setAll] = useState(false)
+  if (!Array.isArray(paths) || paths.length === 0) return null
+  const shown = all ? paths : paths.slice(0, FIRST_PATHS)
+  return (
+    <div className="categories">
+      <h3>Categories</h3>
+      <ul className="plain">
+        {shown.map((path, i) => <li key={i}>{categoryPath(path)}</li>)}
+      </ul>
+      {!all && paths.length > FIRST_PATHS && (
+        <button type="button" onClick={() => setAll(true)}>Show all {paths.length}</button>
+      )}
+    </div>
+  )
+}
 import { useAsync } from '../hooks.js'
 import { canFindSimilar } from '../models.js'
 import { useSelection } from '../selection.js'
@@ -50,9 +72,10 @@ export default function ProductPage() {
                 Amazon page
               </a>
             </p>
+            <Categories key={asin} paths={info.data.product.categories} />
             <p className="hint">
-              Rating and sales rank (lower sells better) are Amazon's, from the 2006 data, so the Amazon
-              page may no longer exist.
+              Rating, sales rank (lower sells better) and categories are Amazon's, from the 2006 data, so
+              the Amazon page may no longer exist.
             </p>
           </section>
           <h2>Similar products</h2>

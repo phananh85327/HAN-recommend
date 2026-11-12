@@ -1,5 +1,6 @@
 import { Link } from 'react-router'
 import { DETAILS_TITLE, productDetails } from '../format.js'
+import CategoryLine from './CategoryLine.jsx'
 import GroupBadge from './GroupBadge.jsx'
 
 /** One ranked product. `overlap` is how many of the lists on the page hold it; `reviewed` marks a
@@ -24,6 +25,7 @@ export default function ProductCard({ item, overlap = 1, reviewed = false, score
             </span>
           )}
         </div>
+        <CategoryLine path={item.category} />
       </div>
       <span className="score" title={scoreLabel}>{item.score.toFixed(3)}</span>
     </li>

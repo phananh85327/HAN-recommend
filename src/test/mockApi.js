@@ -14,7 +14,13 @@ export const MODELS = [
   info('popularity_s1', 'popularity', 'none', '-', []),
 ]
 
+// a product as an older API sends it (no details, no category) ...
 export const product = (asin, title, group = 'Book') => ({ asin, title, group })
+
+// ... and as the current one does, with its first category path
+export const productWithCategory = (asin, title, group = 'Book', category = null) => ({
+  ...product(asin, title, group), sales_rank: 1000, avg_rating: 4.5, reviewers: 30, category,
+})
 
 export function items(...products) {
   return products.map((p, i) => ({ rank: i + 1, ...p, score: 1 - i / 10 }))

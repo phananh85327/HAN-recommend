@@ -45,9 +45,11 @@ async function get(path, params) {
 
 const id = value => encodeURIComponent(String(value).trim())
 
-// In the answers below, a product is {asin, title, group, sales_rank, avg_rating, reviewers}. An API
-// older than HAN-improve commit 49d41e7 sends only {asin, title, group}; the pages then leave the
-// rest out. A recommendation item is a product plus {rank, score}.
+// In the answers below, a product is {asin, title, group, sales_rank, avg_rating, reviewers,
+// category}: category is its first Amazon category path, a list of names from the root down, or
+// null. /api/products/<ASIN> adds product.categories, every path. An older API sends less (before
+// HAN-improve 49d41e7 only {asin, title, group}; before the categories no category fields); the
+// pages then leave the rest out. A recommendation item is a product plus {rank, score}.
 export const api = {
   /** {status, models, products, users} */
   health: () => get('health'),
@@ -63,7 +65,7 @@ export const api = {
     get(`users/${id(userId)}/recommendations`, { models: models.join(','), k, exclude_seen: excludeSeen }),
   /** {products: [product]} */
   searchProducts: (q, limit = 50) => get('products', { q, limit }),
-  /** {product, reviewers} */
+  /** {product: {...product, categories: [[name, ...], ...]}, reviewers} */
   product: asin => get(`products/${id(asin)}`),
   /** {product, k, results: [{...model info, items: [item]}]} */
   similar: (asin, { models, k }) => get(`products/${id(asin)}/similar`, { models: models.join(','), k }),

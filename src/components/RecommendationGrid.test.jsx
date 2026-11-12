@@ -1,7 +1,7 @@
 import { render, screen, within } from '@testing-library/react'
 import { MemoryRouter } from 'react-router'
 import { describe, expect, it } from 'vitest'
-import { MODELS, items, product } from '../test/mockApi.js'
+import { MODELS, items, product, productWithCategory } from '../test/mockApi.js'
 import RecommendationGrid from './RecommendationGrid.jsx'
 
 const book = product('0201924889', 'Effective C++')
@@ -41,6 +41,22 @@ describe('RecommendationGrid', () => {
     render(<MemoryRouter><RecommendationGrid results={withDetails} /></MemoryRouter>)
     expect(screen.getByText('Effective C++').closest('li')).toHaveTextContent('★ 4.5 · 30 reviewers')
     expect(screen.getByText('Design Patterns').closest('li')).not.toHaveTextContent('reviewers')
+  })
+
+  it('shows a card\'s category path, shortened, with the full path on hover; nothing without one', () => {
+    const path = ['Books', 'Subjects', 'Computers & Internet', 'Programming', 'C & C++']
+    const withCategory = [{
+      ...MODELS[3],
+      items: items(productWithCategory('0201924889', 'Effective C++', 'Book', path),
+        productWithCategory('B000002UB2', 'Abbey Road', 'Music', null), product('0201633612', 'Design Patterns')),
+    }]
+    render(<MemoryRouter><RecommendationGrid results={withCategory} /></MemoryRouter>)
+    const line = screen.getByText('… › Computers & Internet › Programming › C & C++')
+    expect(line).toHaveAttribute('title', 'Books › Subjects › Computers & Internet › Programming › C & C++')
+    expect(line.closest('li')).toHaveTextContent('Effective C++')
+    for (const title of ['Abbey Road', 'Design Patterns']) {
+      expect(screen.getByText(title).closest('li')).not.toHaveTextContent('›')
+    }
   })
 
   it('marks products the customer reviewed', () => {

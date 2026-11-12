@@ -37,7 +37,7 @@ one address. If the API runs on another port, copy `.env.example` to `.env.local
 | Customers (`/users`) | Look up a customer ID or user index, or draw a random sample by number of reviewed products |
 | Customer (`/users/<customer id>`) | What the customer reviewed, then each model's list side by side |
 | Products (`/products`) | Search by title or ASIN (every word must appear) |
-| Product (`/products/<ASIN>`) | The product, then each model's most similar products |
+| Product (`/products/<ASIN>`) | The product with all its Amazon category paths, then each model's most similar products |
 | Models (`/models`) | The served results, with test Hit@10, NDCG@10 and validation BPR |
 
 On the customer and product pages:
@@ -49,10 +49,13 @@ On the customer and product pages:
   recommend next. Ticked, the customer's own products are marked "reviewed": a model that knows the
   customer ranks several of them near the top.
 - **"in N lists"** marks a product that N of the lists on the page contain.
-- **Each product** shows its group, ASIN, Amazon's average rating and how many customers in the
-  data reviewed it; the product page adds its Amazon sales rank (lower sells better). Rating and
-  sales rank come from the 2006 data. They need the API of HAN-improve commit `49d41e7` or later;
-  with an older API they are left out.
+- **Each product** shows its group, ASIN, Amazon's average rating, how many customers in the data
+  reviewed it, and its Amazon category path: in lists the first path, shortened to its last three
+  levels (`… › Computers & Internet › Programming › C & C++`, the full path on hover). The
+  product page adds its sales rank (lower sells better) and every category path in full, the first
+  10 and then a "Show all" button. All of it comes from the 2006 data. Rating, reviewers and sales
+  rank need the API of HAN-improve commit `49d41e7` or later, and the categories a later one with
+  the category files; with an older API they are left out.
 
 The settings are part of the address, so a view can be bookmarked or shared, e.g.
 `/users/A3FF936V6MPPDI?size=4&k=20`.

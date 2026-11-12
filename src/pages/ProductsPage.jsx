@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link, useSearchParams } from 'react-router'
 import { api } from '../api.js'
+import CategoryLine from '../components/CategoryLine.jsx'
 import DemoList from '../components/DemoList.jsx'
 import GroupBadge from '../components/GroupBadge.jsx'
 import { ErrorBox, Loading } from '../components/Status.jsx'
@@ -44,6 +45,7 @@ export default function ProductsPage() {
                 <Link to={`/products/${encodeURIComponent(p.asin)}`}>{p.title || p.asin}</Link>{' '}
                 <span className="asin">{p.asin}</span>
                 {productDetails(p) && <span className="details" title={DETAILS_TITLE}> · {productDetails(p)}</span>}
+                <CategoryLine path={p.category} as="span" prefix=" · " />
               </li>
             ))}
           </ul>

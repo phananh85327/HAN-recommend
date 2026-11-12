@@ -1,5 +1,6 @@
 import { Link, useParams } from 'react-router'
 import { api } from '../api.js'
+import CategoryLine from '../components/CategoryLine.jsx'
 import GroupBadge from '../components/GroupBadge.jsx'
 import ModelControls from '../components/ModelControls.jsx'
 import RecommendationGrid from '../components/RecommendationGrid.jsx'
@@ -23,6 +24,7 @@ function Profile({ data }) {
           {data.products.map(p => (
             <li key={p.asin}>
               <GroupBadge group={p.group} /> <Link to={`/products/${encodeURIComponent(p.asin)}`}>{p.title || p.asin}</Link>
+              <CategoryLine path={p.category} as="span" prefix=" · " />
             </li>
           ))}
         </ul>
